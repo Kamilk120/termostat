@@ -1,0 +1,88 @@
+#include <max6675.h> // max6675.h file is part of the library that you should download from Robojax.com
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#include <string.h>
+int soPin = 12;// SO=Serial Out
+int csPin = 10;// CS = chip select CS pin
+int sckPin = 13;// SCK = Serial Clock pin
+
+//enkoder piny
+int const encCLK_Pin = 3;
+int const encDT_Pin = 4;
+int const encSW_Pin = 2;
+
+//enkoder zmienne
+int counter_enc = 0;
+
+int currentStateCLK;
+int previousStateCLK;
+
+String encdir ="";
+// częstotliwość
+
+unsigned long fLCD = 1000;
+unsigned long fEN = 10;
+
+float temp; //zmienna do sredniej
+MAX6675 robojax(sckPin, csPin, soPin);// create instance object of MAX6675
+LiquidCrystal_I2C lcd(0x27,16,2); // create instance lcd
+
+void temp_avr(); // function to read temperature wutch avr
+
+void setup() {
+  // Set encoder pins as inputs  
+  pinMode (encCLK_Pin,INPUT);
+  pinMode (encDT_Pin,INPUT);
+
+  lcd.init();
+  Serial.begin(9600);// initialize serial monitor with 9600 baud 
+  // Assign to previousStateCLK variable
+  previousStateCLK = digitalRead(encCLK_Pin);
+}
+
+void loop() {
+  // Read the current state of inputCLK
+  currentStateCLK = digitalRead(encCLK_Pin);
+   
+  // If the previous and the current state of the inputCLK are different then a pulse has occured
+  if (currentStateCLK != previousStateCLK){ 
+      
+    // If the inputDT state is different than the inputCLK state then 
+    // the encoder is rotating counterclockwise
+    if (digitalRead(encDT_Pin) != currentStateCLK) { 
+      counter_enc --;
+      encdir ="CCW";
+      
+    } else {
+      // Encoder is rotating clockwise
+      counter_enc ++;
+      encdir ="CW";
+      
+    }
+    Serial.print("Direction: ");
+    Serial.print(encdir);
+    Serial.print(" -- Value: ");
+    Serial.println(counter_enc);
+  } 
+  // Update previousStateCLK with the current state
+  previousStateCLK = currentStateCLK;
+
+  //   temp_avr();
+  //    Serial.print("C = "); 
+  //    Serial.print(robojax.readCelsius());
+     
+  //   lcd.backlight();
+  //   lcd.setCursor(3,0);
+  //   lcd.print("C = ");
+  //   lcd.print(temp);
+       
+  // delay(1000);
+}
+void temp_avr(){
+    temp = 0;
+    for(int i = 0; i < 10; i++){
+        temp += robojax.readCelsius();
+        delay(100);
+      }
+    temp /=10 ;
+  }
