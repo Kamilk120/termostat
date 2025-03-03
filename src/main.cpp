@@ -5,8 +5,8 @@
 #include <Arduino.h>
 
 //enkoder piny
-int const CLKen = 6;
-int const DTen = 5;
+int const CLKen = 3;
+int const DTen = 2;
 int const SWen = 4;
 
 //thermopar pin
@@ -55,5 +55,5 @@ void loop() {
         lcd.print(newPosition);
     }
     time_now = millis();
-    Serial.print(time_now);
+    //Serial.print(time_now);
 }
