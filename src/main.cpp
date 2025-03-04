@@ -32,6 +32,11 @@ unsigned long frecfency_max6675 = 1000;
 unsigned long remember_time_relay = 0;
 unsigned long delay_time = 5000;
 
+//remember time display_off
+unsigned long remember_time_displayoff = 0;
+unsigned long display_turn_on_time = 10000;
+unsigned long count_screen_off = 0;
+
 Encoder myEnc(DTen, CLKen);
 MAX6675 robojax(sckPin, csPin, soPin);
 LiquidCrystal_I2C lcd(0x27,collumnLCD,rowLCD);
@@ -41,6 +46,7 @@ LiquidCrystal_I2C lcd(0x27,collumnLCD,rowLCD);
 void menu_default(); //funcion for set temperature
 void relay_switching();// switching heat
 void temperature(); // read temperature
+void screen_saver();// screen saver
 
 void setup() {
     lcd.init();
@@ -97,3 +103,14 @@ void relay_switching(){
         }
     }
 }
+
+// void screen_saver(){
+//     if(count_screen_off >= 1000){
+//         lcd.noDisplay();
+
+//     }else{
+        
+//         count_screen_off++;
+//     }
+
+// }
