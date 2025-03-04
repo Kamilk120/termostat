@@ -4,12 +4,12 @@
 #include <LiquidCrystal_I2C.h>
 #include <Arduino.h>
 
-//enkoder piny
+//enkoder pins
 int const CLKen = 3;
 int const DTen = 2;
 int const SWen = 4;
 
-//thermopar pin
+//thermopar pins
 int const soPin = 12;// SO=Serial Out
 int const csPin = 10;// CS = chip select CS pin
 int const sckPin = 13;// SCK = Serial Clock pin
