@@ -14,6 +14,9 @@ int const soPin = 12;// SO=Serial Out
 int const csPin = 10;// CS = chip select CS pin
 int const sckPin = 13;// SCK = Serial Clock pin
 
+//relay pin
+int const SPin = 6;
+
 //lcd scale
 int const rowLCD = 2;
 int const collumnLCD = 16;
@@ -25,35 +28,72 @@ unsigned long time_now = millis();
 unsigned long remember_time_max6675 = 0;
 unsigned long frecfency_max6675 = 1000;
 
+//remember time max6675
+unsigned long remember_time_relay = 0;
+unsigned long delay_time = 5000;
+
 Encoder myEnc(DTen, CLKen);
 MAX6675 robojax(sckPin, csPin, soPin);
 LiquidCrystal_I2C lcd(0x27,collumnLCD,rowLCD);
+
+
+
+void menu_default(); //funcion for set temperature
+void relay_switching();// switching heat
+void temperature(); // read temperature
 
 void setup() {
     lcd.init();
     lcd.backlight();
     Serial.begin(9600);
+    pinMode(SPin, OUTPUT); 
+    
     Serial.println("Basic Encoder Test:");
-
 }
 
 long oldPosition  = -999;
+long newPosition = myEnc.read();
+long read_temperature;
 
 void loop() {
+    temperature();
+    menu_default();
+    relay_switching();
+    time_now = millis();
+    //Serial.print(robojax.readCelsius());
+    }
+
+void temperature(){
     if(time_now - remember_time_max6675 >= frecfency_max6675){
         remember_time_max6675 = time_now;
+        read_temperature = robojax.readCelsius();
         lcd.setCursor(3,0);
         lcd.print("C = ");
-        lcd.print(robojax.readCelsius());
+        lcd.print(read_temperature);
     }
-    long newPosition = myEnc.read();
+}
+
+void menu_default(){
+    newPosition = myEnc.read();
     if (newPosition != oldPosition) {
         oldPosition = newPosition;
         Serial.println(newPosition);
         lcd.setCursor(3,1);
         lcd.print("max = ");
+        lcd.setCursor(9,1);
+        lcd.print("      ");
+        lcd.setCursor(9,1);
         lcd.print(newPosition);
+    } 
+}
+
+void relay_switching(){
+    if(time_now - remember_time_relay >= delay_time){
+        remember_time_relay = time_now;
+        if(read_temperature <= newPosition){
+            digitalWrite(SPin, HIGH);
+        }else{
+            digitalWrite(SPin, LOW);
+        }
     }
-    time_now = millis();
-    //Serial.print(time_now);
 }
